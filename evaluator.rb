@@ -22,15 +22,10 @@ class SexpJSON
   end
 
   def eval sexpr, ctx=@env
-    puts "SEXP: #{sexpr}"
     return (ctx[sexpr] || sexpr) if ctx[:atom].call([sexpr], ctx)
 
     fn, *args = sexpr
-    puts "FN: #{fn}"
-    puts "ARGS: #{args}"
-    if ctx[fn].is_a?(Array) || (ctx[fn].respond_to?(:lambda?) && ctx[fn].lambda?)
-      args = args.map { |arg| self.eval(arg, ctx) }
-    end # If it's an sexpr or a lambda, eval it, other
+    args = args.map { |arg| self.eval(arg, ctx) } if ctx[fn].is_a?(Array) || (ctx[fn].respond_to?(:lambda?) && ctx[fn].lambda?) # Eval it if another Sexp, or lambda
     self.apply(fn, args, ctx)
   end
 end
